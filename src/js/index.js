@@ -1,64 +1,96 @@
-import { fetchCountries } from './fetchCountries.js';
-import debounce from 'lodash.debounce';
-import Notiflix from 'notiflix';
+import Notiflix from "notiflix";
+import { fetchCountries } from "./fetchCountries";
 
-const searchBox = document.getElementById('search-box');
-const countryList = document.getElementById('country-list');
-const countryInfo = document.getElementById('country-info');
+const refs = {
+  countryInput: document.querySelector("#search-box"),
+  countryList: document.querySelector("#country-list"),
+  countryInfo: document.querySelector("#country-info"),
+};
 
-function displayCountryList(countries) {
-  let countryListItems = '';
-  countries.forEach(country => {
-    const { name, flag } = country;
-    countryListItems += `<li><img src="${flag}" alt="${name}" width="32"> ${name}</li>`;
-  });
-  countryList.innerHTML = countryListItems;
-  countryInfo.innerHTML = '';
+const DEBOUNCE_DELAY = 300;
+let debounceTimerId = null;
+
+refs.countryInput.addEventListener("input", onSearch);
+
+function onSearch() {
+  const searchQuery = refs.countryInput.value.trim();
+
+  if (!searchQuery) {
+    clearMarkup();
+    return;
+  }
+
+  if (debounceTimerId) {
+    clearTimeout(debounceTimerId);
+  }
+
+  debounceTimerId = setTimeout(() => {
+    fetchCountries(searchQuery)
+      .then((countries) => {
+        if (countries.length > 10) {
+          Notiflix.warning("Too many matches found. Please enter a more specific name.");
+          clearMarkup();
+          return;
+        }
+
+        if (countries.length >= 2 && countries.length <= 10) {
+          renderCountriesList(countries);
+          clearMarkup(refs.countryInfo);
+          return;
+        }
+
+        if (countries.length === 1) {
+          renderCountryCard(countries[0]);
+          clearMarkup(refs.countryList);
+          return;
+        }
+
+        Notiflix.failure("Oops, there was an error. Please try again later.");
+        clearMarkup();
+      })
+      .catch((error) => {
+        Notiflix.failure("Oops, there was an error. Please try again later.");
+        console.log(error);
+      })
+      .finally(() => {
+        debounceTimerId = null;
+      });
+  }, DEBOUNCE_DELAY);
 }
 
-function displayCountryInfo(country) {
-    if (!country || !country.languages) return;
-  const { name, capital, population, languages, flag } = country;
-  let languagesList = '';
-  languages.forEach(({ name }) => {
-    languagesList += `${name}, `;
-  });
-  languagesList = languagesList.slice(0, -2);
-  countryInfo.innerHTML = `
-    <div>
-      <img src="${flag}" alt="${name}" width="200">
-      <h2>${name}</h2>
-      <p><strong>Capital:</strong> ${capital}</p>
-      <p><strong>Population:</strong> ${population.toLocaleString()}</p>
-      <p><strong>Languages:</strong> ${languagesList}</p>
+function clearMarkup(element = refs.countryList) {
+  element.innerHTML = "";
+}
+
+function renderCountriesList(countries) {
+  const markup = countries
+    .map((country) => {
+      return `
+        <li class="country-list-item">
+          <img src="${country.flag}" alt="${country.name}" class="country-flag">
+          <p class="country-name">${country.name}</p>
+        </li>
+      `;
+    })
+    .join("");
+
+  refs.countryList.innerHTML = markup;
+}
+
+function renderCountryCard(country) {
+  const markup = `
+    <div class="country-card">
+      <img src="${country.flag}" alt="${country.name}" class="country-flag-card">
+      <div class="country-info-card">
+        <h2 class="country-name-card">${country.name}</h2>
+        <p><span class="country-info-label">Capital:</span> ${country.capital}</p>
+        <p><span class="country-info-label">Population:</span> ${country.population}</p>
+        <p><span class="country-info-label">Languages:</span> ${country.languages
+    .map((language) => language.name)
+    .join(", ")}</p>
+      </div>
     </div>
   `;
-  countryList.innerHTML = '';
-}
 
-function handleSearch() {
-  const searchTerm = searchBox.value.trim();
-  if (searchTerm.length >= 2) {
-    fetchCountries(searchTerm)
-      .then(countries => {
-        if (countries.length > 10) {
-          Notiflix.Notify.info(
-            'Too many matches found. Please enter a more specific name.'
-          );
-        } else if (countries.length === 1) {
-          displayCountryInfo(countries[0]);
-        } else {
-          displayCountryList(countries);
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        countryList.innerHTML = `<li>Error getting country data. Please try again.</li>`;
-      });
-  } else {
-    countryList.innerHTML = '';
-    countryInfo.innerHTML = '';
-  }
+  refs.countryInfo.innerHTML = markup;
 }
-
-searchBox.addEventListener('input', debounce(handleSearch, 300));

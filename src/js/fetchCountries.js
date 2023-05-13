@@ -1,12 +1,19 @@
-export async function fetchCountries(name) {
-  const fields = "fields=name,officialName,capital,population,flags/languages/name";
-  const url = `https://restcountries.com/v2/name/${name}?${fields}`;
+const BASE_URL = "https://restcountries.com/v2";
 
-  return fetch(url).then((response) => {
-    if (response.ok) {
+export function fetchCountries(searchQuery) {
+  return fetch(`${BASE_URL}/name/${searchQuery}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+
       return response.json();
-    } else {
-      throw new Error("No matching countries found");
-    }
-  });
+    })
+    .then((countries) => {
+      if (countries.length > 10) {
+        return [];
+      }
+
+      return countries;
+    });
 }
