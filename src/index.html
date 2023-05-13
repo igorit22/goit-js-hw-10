@@ -5,12 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Homework 10</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://www.edu.goit.global/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="https://www.edu.goit.global/favicon-16x16.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <input type="text" id="search-box" />
-    <ul class="country-list"></ul>
-    <div class="country-info"></div>
-
-    <script src="index.js" type="module"></script>
+    <div class="search-container">
+      <h1>Search countries</h1>
+      <form name="country-search">
+        <label for="country-input">Enter country name:</label>
+        <input id="search-box" type="text" />
+      </form>
+      <ul id="country-list"></ul>
+      <div id="country-info"></div>
+    </div>
+    <script src="./js/index.js" type="module"></script>
   </body>
 </html>
