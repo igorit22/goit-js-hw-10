@@ -50,3 +50,25 @@ input[type='text'] {
 img {
   width: 200px;
 }
+
+ul {
+  list-style-type: none;
+}
+
+.country-list-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.country-name {
+  margin-left: 15px;
+}
+
+.country-flag {
+  width: 60px;
+}
+
+#country-list li {
+  text-decoration: none;
+}
