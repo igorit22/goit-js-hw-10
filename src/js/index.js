@@ -1,6 +1,6 @@
-import Notiflix from 'notiflix';
 import { fetchCountries } from './fetchCountries';
 import debounce from 'lodash.debounce';
+import Notiflix from 'notiflix';
 
 const refs = {
   countryInput: document.querySelector('#search-box'),
@@ -9,11 +9,10 @@ const refs = {
 };
 
 const DEBOUNCE_DELAY = 300;
-let debounceTimerId = null;
 
 refs.countryInput.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
 
-function onSearch() {
+async function onSearch() {
   const searchQuery = refs.countryInput.value.trim();
 
   if (searchQuery === '') {
@@ -22,14 +21,17 @@ function onSearch() {
     return;
   }
 
-  fetchCountries(searchQuery)
-    .then(countries => handleSearchResult(countries))
-    .catch(error => handleSearchError(error));
+  try {
+    const countries = await fetchCountries(searchQuery);
+    handleSearchResult(countries);
+  } catch (error) {
+    handleSearchError(error);
+  }
 }
 
 function handleSearchResult(countries) {
   if (countries.length > 10) {
-    Notiflix.Notify.warning(
+    Notiflix.Notify.info(
       'Too many matches found. Please enter a more specific name.'
     );
     clearMarkup(refs.countryList);
@@ -48,15 +50,18 @@ function handleSearchResult(countries) {
     clearMarkup(refs.countryList);
     return;
   }
-
-  Notiflix.Notify.failure('Oops, there was an error. Please try again later.');
   clearMarkup();
 }
 
 function handleSearchError(error) {
-  Notiflix.Notify.failure('Oops, there was an error. Please try again later.');
-  console.log(error);
+  if (error.status === 404) {
+    Notiflix.Notify.info('Oops, there is no country with that name.');
+  } else {
+    Notiflix.Notify.failure('Oops, there was an error. Please try again later.');
+    console.log(error);
+  }
 }
+
 
 function clearMarkup(element) {
   if (element) {
@@ -103,6 +108,8 @@ function renderCountryCard(country) {
   refs.countryInfo.innerHTML = markup;
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
   refs.countryInput.value = '';
+  clearMarkup(refs.countryList);
+  clearMarkup(refs.countryInfo);
 });

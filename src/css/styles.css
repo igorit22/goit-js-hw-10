@@ -67,6 +67,13 @@ ul {
 
 .country-flag {
   width: 60px;
+  border: 1px solid;
+  border-color: rgb(209, 209, 209);
+}
+
+.country-flag-card {
+  border: 1px solid;
+  border-color: rgb(209, 209, 209);
 }
 
 #country-list li {
