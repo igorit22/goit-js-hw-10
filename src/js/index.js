@@ -25,12 +25,21 @@ async function onSearch() {
     const countries = await fetchCountries(searchQuery);
     handleSearchResult(countries);
   } catch (error) {
-    handleSearchError(error);
+    if (error.message === 'Too many matches found. Please enter a more specific name.') {
+      Notiflix.Notify.info(error.message);
+      clearMarkup(refs.countryList);
+      clearMarkup(refs.countryInfo);
+    } else if (error.message === 'Country not found') {
+      Notiflix.Notify.info('Oops, there is no country with that name.');
+    } else {
+      Notiflix.Notify.failure('Oops, there was an error. Please try again later.');
+      console.log(error);
+    }
   }
 }
 
 function handleSearchResult(countries) {
-  if (countries.length > 10) {
+  if (countries.length >= 10) {
     Notiflix.Notify.info(
       'Too many matches found. Please enter a more specific name.'
     );

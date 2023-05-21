@@ -10,7 +10,7 @@ export async function fetchCountries(searchQuery) {
   }
   const countries = await response.json();
   if (countries.length > 10) {
-    return [];
+    throw new Error('Too many matches found. Please enter a more specific name.');
   }
   return countries;
 }
