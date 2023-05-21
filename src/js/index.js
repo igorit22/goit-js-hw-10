@@ -30,7 +30,7 @@ async function onSearch() {
       clearMarkup(refs.countryList);
       clearMarkup(refs.countryInfo);
     } else if (error.message === 'Country not found') {
-      Notiflix.Notify.info('Oops, there is no country with that name.');
+      Notiflix.Notify.failure('Oops, there is no country with that name.');
     } else {
       Notiflix.Notify.failure('Oops, there was an error. Please try again later.');
       console.log(error);
@@ -39,15 +39,6 @@ async function onSearch() {
 }
 
 function handleSearchResult(countries) {
-  if (countries.length >= 10) {
-    Notiflix.Notify.info(
-      'Too many matches found. Please enter a more specific name.'
-    );
-    clearMarkup(refs.countryList);
-    clearMarkup(refs.countryInfo);
-    return;
-  }
-
   if (countries.length >= 2 && countries.length <= 10) {
     renderCountriesList(countries);
     clearMarkup(refs.countryInfo);
@@ -61,16 +52,6 @@ function handleSearchResult(countries) {
   }
   clearMarkup();
 }
-
-function handleSearchError(error) {
-  if (error.status === 404) {
-    Notiflix.Notify.info('Oops, there is no country with that name.');
-  } else {
-    Notiflix.Notify.failure('Oops, there was an error. Please try again later.');
-    console.log(error);
-  }
-}
-
 
 function clearMarkup(element) {
   if (element) {
