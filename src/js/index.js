@@ -31,9 +31,13 @@ async function onSearch() {
       clearMarkup(refs.countryInfo);
     } else if (error.message === 'Country not found') {
       Notiflix.Notify.failure('Oops, there is no country with that name.');
+      clearMarkup(refs.countryList);
+      clearMarkup(refs.countryInfo);
     } else {
       Notiflix.Notify.failure('Oops, there was an error. Please try again later.');
       console.log(error);
+      clearMarkup(refs.countryList);
+      clearMarkup(refs.countryInfo);
     }
   }
 }
